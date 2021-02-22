@@ -49,6 +49,7 @@ def test_all():
             test_file.write(line)
 
         test_file.close()
+        test_template.flush()
         test_template.close()
         
         test_path = ASSIGNMENTS + '/' + assignment + '/' + submissionName + "_test.py"
@@ -60,6 +61,7 @@ def test_all():
             
         remove(test_path)
 
+# We use immediate print because when child processes end they write first, but we want to preserve order of messages
 def immediate_print(text):
     print(text, flush=True)
 

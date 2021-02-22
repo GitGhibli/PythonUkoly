@@ -1,4 +1,5 @@
 # Zadanie
 #...
 #
-def asterisk_triangles():
+def asterisk_triangles(iterations):
+    ...
