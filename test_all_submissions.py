@@ -2,6 +2,8 @@ import sys
 from os import listdir, system, remove
 from os.path import isfile, isdir, join, dirname
 
+import subprocess
+
 ASSIGNMENTS = "assignments"
 SUBMISSIONS = "submissions"
 TEST_FILE = "test.py"
@@ -23,17 +25,19 @@ def test_all():
     submissions_path = join(assignment_path, SUBMISSIONS)
 
     if not isdir(assignment_path):
-        print("invalid directory")
-        print(assignment_path)
+        immediate_print("invalid directory")
+        immediate_print(assignment_path)
         return
 
     submissions = [f for f in listdir(submissions_path) if isfile(join(submissions_path, f))]
-
+    
+    immediate_print(assignment)
+    
     for submission in submissions:
         submissionName = submission.replace(".py", "")
-        print('=====================================================================')
-        print('=====================================================================')
-        print(submissionName)
+        immediate_print('=====================================================================')
+        immediate_print('=====================================================================')
+        immediate_print(submissionName)
 
         test_template = open(join(assignment_path, "test.py"), "r")
         test_file = open(join(assignment_path,submissionName + "_test.py"), "w")
@@ -48,11 +52,16 @@ def test_all():
         test_template.close()
         
         test_path = ASSIGNMENTS + '/' + assignment + '/' + submissionName + "_test.py"
-        system('cmd /c echo ' + assignment)
-        system('cmd /c py ' + test_path)
-
+        try:
+            output = subprocess.check_output(["py", test_path], stderr=subprocess.STDOUT)
+            immediate_print(output.decode().replace('\r', ''))
+        except subprocess.CalledProcessError as e:
+            immediate_print(e.output.decode().replace('\r', ''))
+            
         remove(test_path)
 
+def immediate_print(text):
+    print(text, flush=True)
 
 if __name__ == '__main__':
     test_all()
