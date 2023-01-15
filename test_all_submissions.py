@@ -1,5 +1,5 @@
 import sys
-from os import listdir, system, remove
+from os import listdir, remove
 from os.path import isfile, isdir, join, dirname
 
 import subprocess
@@ -49,17 +49,22 @@ def test_all():
             test_file.write(line)
 
         test_file.close()
-        test_template.flush()
         test_template.close()
         
         test_path = ASSIGNMENTS + '/' + assignment + '/' + submissionName + "_test.py"
         try:
-            output = subprocess.check_output(["py", test_path], stderr=subprocess.STDOUT)
+            output = subprocess.check_output(["python", test_path], stderr=subprocess.STDOUT, timeout=2)
             immediate_print(output.decode().replace('\r', ''))
+        except subprocess.TimeoutExpired as e:
+            immediate_print("code timeouted")    
+            print("FAIL")
         except subprocess.CalledProcessError as e:
             immediate_print(e.output.decode().replace('\r', ''))
+            print("FAIL")
             
         remove(test_path)
+    
+    print("DONE")
 
 # We use immediate print because when child processes end they write first, but we want to preserve order of messages
 def immediate_print(text):
